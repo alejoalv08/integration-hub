@@ -11,7 +11,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./data:/app/../data  # Share the data folder with the container
+      - ./data:/app/../data
     restart: unless-stopped
 
   # ─── Service B: Gateway API ──────────────────────────────────
@@ -22,11 +22,10 @@ services:
     container_name: integration-hub-gateway
     ports:
       - "3002:3002"
+    env_file:
+      - ./gateway-api/.env
     environment:
       - SOURCE_API_URL=http://source-api:3001
-      - GEOAPIFY_API_KEY=${GEOAPIFY_API_KEY}
-      - PORT=3002
-      - SERVICE_TIME_MIN=${SERVICE_TIME_MIN:-60}
     depends_on:
       - source-api
     restart: unless-stopped
