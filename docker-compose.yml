@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+
+  # ─── Service A: Source API ───────────────────────────────────
+  source-api:
+    build:
+      context: ./source-api
+      dockerfile: Dockerfile
+    container_name: integration-hub-source
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./data:/app/../data  # Share the data folder with the container
+    restart: unless-stopped
+
+  # ─── Service B: Gateway API ──────────────────────────────────
+  gateway-api:
+    build:
+      context: ./gateway-api
+      dockerfile: Dockerfile
+    container_name: integration-hub-gateway
+    ports:
+      - "3002:3002"
+    environment:
+      - SOURCE_API_URL=http://source-api:3001
+      - GEOAPIFY_API_KEY=${GEOAPIFY_API_KEY}
+      - PORT=3002
+      - SERVICE_TIME_MIN=${SERVICE_TIME_MIN:-60}
+    depends_on:
+      - source-api
+    restart: unless-stopped
