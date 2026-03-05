@@ -1,0 +1,266 @@
+{
+  "info": {
+    "name": "Integration Hub — Customer Integration Specialist",
+    "description": "Complete API collection for the Integration Hub technical test. Run requests in the order listed for best results.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Service A — Source API",
+      "item": [
+        {
+          "name": "GET /raw/orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3001/raw/orders",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["raw", "orders"]
+            },
+            "description": "Returns all raw orders. Supports filters: customer_code, order_type, shipmentid, limit, offset."
+          }
+        },
+        {
+          "name": "GET /raw/orders (filtered by customer)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3001/raw/orders?customer_code=CUST-A",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["raw", "orders"],
+              "query": [{ "key": "customer_code", "value": "CUST-A" }]
+            },
+            "description": "Filter raw orders by customer_code."
+          }
+        },
+        {
+          "name": "GET /raw/orders (filtered by order_type)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3001/raw/orders?order_type=FTL",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["raw", "orders"],
+              "query": [{ "key": "order_type", "value": "FTL" }]
+            },
+            "description": "Filter raw orders by order type (FTL or LTL)."
+          }
+        },
+        {
+          "name": "GET /raw/orders/:shipmentid",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3001/raw/orders/SHP-001",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["raw", "orders", "SHP-001"]
+            },
+            "description": "Returns ALL occurrences of a shipment including duplicates."
+          }
+        },
+        {
+          "name": "POST /raw/simulate-refresh",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:3001/raw/simulate-refresh",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["raw", "simulate-refresh"]
+            },
+            "description": "Simulates a pricing refresh from the source system using the live USD→COP rate."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Service B — Gateway API",
+      "item": [
+        {
+          "name": "POST /orders/sync",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:3002/orders/sync",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "sync"]
+            },
+            "description": "Fetches all orders from Source API and builds the normalized model. Run this first!"
+          }
+        },
+        {
+          "name": "GET /orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders"]
+            },
+            "description": "Returns current version of all normalized orders."
+          }
+        },
+        {
+          "name": "GET /orders (filter by customer)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders?customer_code=CUST-A",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders"],
+              "query": [{ "key": "customer_code", "value": "CUST-A" }]
+            },
+            "description": "Filter normalized orders by customer_code."
+          }
+        },
+        {
+          "name": "GET /orders (filter by date range)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders?date_from=2025-06-01&date_to=2025-06-05",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders"],
+              "query": [
+                { "key": "date_from", "value": "2025-06-01" },
+                { "key": "date_to", "value": "2025-06-05" }
+              ]
+            },
+            "description": "Filter orders by pickup date range."
+          }
+        },
+        {
+          "name": "GET /orders (filter by ramp)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders?ramp_filter=RAMP-WEST",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders"],
+              "query": [{ "key": "ramp_filter", "value": "RAMP-WEST" }]
+            },
+            "description": "Filter orders by ramp filter value."
+          }
+        },
+        {
+          "name": "GET /orders/:shipmentid (current)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders/SHP-001",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "SHP-001"]
+            },
+            "description": "Returns only the current version of a shipment (latest hour_end)."
+          }
+        },
+        {
+          "name": "GET /orders/:shipmentid/history",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders/SHP-001/history",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "SHP-001", "history"]
+            },
+            "description": "Returns ALL versions of a shipment for audit purposes."
+          }
+        },
+        {
+          "name": "GET /market/usd-cop",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/market/usd-cop",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["market", "usd-cop"]
+            },
+            "description": "Returns the cached USD→COP exchange rate from open.er-api.com."
+          }
+        },
+        {
+          "name": "POST /orders/refresh-pricing",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:3002/orders/refresh-pricing",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "refresh-pricing"]
+            },
+            "description": "Recalculates all COP values using the live USD→COP exchange rate."
+          }
+        },
+        {
+          "name": "POST /orders/refresh-routing (single shipment)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:3002/orders/refresh-routing?shipmentid=SHP-001",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "refresh-routing"],
+              "query": [{ "key": "shipmentid", "value": "SHP-001" }]
+            },
+            "description": "Geocodes addresses and calculates route + SLA for a specific shipment."
+          }
+        },
+        {
+          "name": "POST /orders/refresh-routing (batch)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:3002/orders/refresh-routing?limit=5&offset=0",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "refresh-routing"],
+              "query": [
+                { "key": "limit", "value": "5" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "description": "Geocodes and routes a batch of orders using limit/offset pagination."
+          }
+        },
+        {
+          "name": "GET /orders/:shipmentid/route",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders/SHP-001/route",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "SHP-001", "route"]
+            },
+            "description": "Returns distance_km and duration_min for a shipment's route."
+          }
+        },
+        {
+          "name": "GET /orders/:shipmentid/feasibility",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3002/orders/SHP-001/feasibility",
+              "host": ["localhost"],
+              "port": "3002",
+              "path": ["orders", "SHP-001", "feasibility"]
+            },
+            "description": "Returns SLA feasibility: whether delivery can be completed within the scheduled window."
+          }
+        }
+      ]
+    }
+  ]
+}
